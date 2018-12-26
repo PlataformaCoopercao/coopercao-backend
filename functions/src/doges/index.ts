@@ -69,3 +69,21 @@ export const addDog = functions.https.onRequest((request, response) => {
         response.status(400).send(error)
     }); 
 });
+
+export const getListDog = functions.https.onRequest((request, response) => {
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+        // return 0
+    }
+    const owner = request.body.owner;
+
+    db.ref('dogs').orderByChild("owner").equalTo(owner).once("value")
+    .then(snapshot => {
+        const data = snapshot.val()
+        response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando cachorro(s):", error);
+        response.status(400).send(error)
+    }); 
+});
