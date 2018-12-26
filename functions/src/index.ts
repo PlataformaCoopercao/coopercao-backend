@@ -5,8 +5,8 @@
 import {addTestDog,getTestDog} from './doges/index'
 export {addTestDog,getTestDog}
 
-import {registerClient} from './clients/index'
-export {registerClient}
+import {registerClient, getClient} from './clients/index'
+export {registerClient, getClient}
 
 
 
