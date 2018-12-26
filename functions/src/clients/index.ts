@@ -32,31 +32,50 @@ export const registerClient = functions.https.onRequest((request, response) => {
         .then(userRecord => {
             // See the UserRecord reference doc for the contents of userRecord.
             console.log("Successfully created new user:", userRecord.uid);
-            db.ref('clients/' + userRecord.uid).set({
-                    name: name,
-                    birth_date: birth_date,
-                    cpf: cpf,
-                    phoneNumber: phoneNumber,
-                    photoURL: photoUrl,
-                    email: email,
-                    adress: {
-                        cep: adress.cep,
-                        street: adress.street,
-                        num: adress.num,
-                        compl: adress.compl
-                    }
-                })
-                .then(() => {
-                    response.status(200).send("Successfully created new user profile");
-                })
-                .catch(function (error) {
-                    console.log("Error creating new user:", error);
-                    response.status(400).send(error)
-                });
+            return db.ref('clients/' + userRecord.uid).set({
+                name: name,
+                birth_date: birth_date,
+                cpf: cpf,
+                phoneNumber: phoneNumber,
+                photoURL: photoUrl,
+                email: email,
+                adress: {
+                    cep: adress.cep,
+                    street: adress.street,
+                    num: adress.num,
+                    compl: adress.compl
+                }
+            })
+        })
+        .then(() => {
+            response.status(200).send("Successfully created new user profile");
         })
         .catch(function (error) {
             console.log("Error creating new user:", error);
             response.status(400).send(error)
         });
+});
+
+export const getClient = functions.https.onRequest((request, response) => {
+
+    const uid = request.body.uid;
+    db.ref('clients/' + uid)
+    .once('value', snapshot => {
+        response.status(200).send(snapshot.val());
+    })
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+
+    // auth.verifyIdToken(request.body.token)
+    //     .then(decodedToken => {
+    //         const uid = decodedToken.uid;
+    //         db.ref('clients/' + uid).once('value', snapshot => {
+    //             response.status(200).send(snapshot.val());
+    //         })
+    //     })
+    //     .catch(error => {
+    //         response.status(400).send(error);
+    //     })
 
 });
