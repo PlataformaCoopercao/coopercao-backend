@@ -87,3 +87,20 @@ export const getListDog = functions.https.onRequest((request, response) => {
         response.status(400).send(error)
     }); 
 });
+
+export const deleteDog = functions.https.onRequest((request, response) => {
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+        // return 0
+    }
+    const dogKey = request.body.dogKey;
+
+    db.ref('dogs/' + dogKey).remove()
+    .then(() => {
+        response.status(200).send("Cão removido com sucesso");
+    })
+    .catch(function (error) {
+        console.log("Erro removendo cachorro:", error);
+        response.status(400).send(error)
+    }); 
+});
