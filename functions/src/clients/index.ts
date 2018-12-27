@@ -106,3 +106,33 @@ export const getClient = functions.https.onRequest((request, response) => {
     //     })
 
 });
+
+export const getPasseiosAgendados = functions.https.onRequest((request, response) => {
+    //RETORNA UM [X, Y] ONDE X SÃO OS PASSEIOS AGENDADOS COM PASSEADORES ALOCADOS E Y SÃO OS SEM PASSEADORES ALOCADOS
+    //firebase serve --only functions
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+        // return 0
+    }
+    const ownerKey = request.body.ownerKey;
+    let data:any[] = [];
+
+    db.ref('walk_assigned').orderByChild("dog/owner").equalTo(ownerKey).once("value")
+    .then(snapshot => {
+        data[0] = snapshot.val()
+        //response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando passeios agendados:", error);
+        response.status(400).send(error)
+    });
+    db.ref('walk_unassigned').orderByChild("dog/owner").equalTo(ownerKey).once("value")
+    .then(snapshot => {
+        data[1] = snapshot.val()
+        response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando passeios agendados:", error);
+        response.status(400).send(error)
+    });
+});
