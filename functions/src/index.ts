@@ -8,6 +8,8 @@ export {addTestDog,getTestDog, addDog, getListDog, deleteDog}
 import {registerClient, getClient} from './clients/index'
 export {registerClient, getClient}
 
+import {getWalker} from './walkers/index'
+export {getWalker}
 
 
 
