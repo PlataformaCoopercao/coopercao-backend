@@ -28,3 +28,28 @@ export const getWalker = functions.https.onRequest((request,response) =>{
     //     })
 
 })
+
+export const updateWalker = functions.https.onRequest((request, response) =>{
+    const uid = request.body.uid;
+    const walker = request.body.walker;
+
+    db.ref('walkers/' + uid).update(walker)
+    .then(() => {
+        response.status(200).send('user updated succesfully');
+    })
+    .catch(error => {
+        response.status(400).send(error);
+    })
+
+
+    // auth.verifyIdToken(request.body.token)
+    //     .then(decodedToken => {
+    //         const uid = decodedToken.uid;
+    //         let walkerRef =  db.ref('walkers/' + uid);
+    //         walkerRed.update(walker)
+    //         response.status(200).send('user updated succesfully');
+    //     })
+    //     .catch(error => {
+    //         response.status(400).send(error);
+    //     })
+})
