@@ -4,6 +4,7 @@ import {
     db
 } from '../db/index';
 
+
 export const registerClient = functions.https.onRequest((request, response) => {
 
     if (request.method !== "POST") {
@@ -56,16 +57,42 @@ export const registerClient = functions.https.onRequest((request, response) => {
         });
 });
 
+export const updateClient = functions.https.onRequest((request, response) => {
+
+    const uid = request.body.uid;
+    const client = request.body.client;
+
+    db.ref('clients/' + uid).update(client)
+    .then(() => {
+        response.status(200).send('user updated succesfully');
+    })
+    .catch(error => {
+        response.status(400).send(error);
+    })
+
+
+    // auth.verifyIdToken(request.body.token)
+    //     .then(decodedToken => {
+    //         const uid = decodedToken.uid;
+    //         let clientRef =  db.ref('clients/' + uid);
+    //         clientRef.update(request.body)
+    //         response.status(200).send('user updated succesfully');
+    //     })
+    //     .catch(error => {
+    //         response.status(400).send(error);
+    //     })
+})
+
 export const getClient = functions.https.onRequest((request, response) => {
 
     const uid = request.body.uid;
     db.ref('clients/' + uid)
-    .once('value', snapshot => {
-        response.status(200).send(snapshot.val());
-    })
-    .catch(error =>{
-        response.status(400).send(error);
-    })
+        .once('value', snapshot => {
+            response.status(200).send(snapshot.val());
+        })
+        .catch(error => {
+            response.status(400).send(error);
+        })
 
     // auth.verifyIdToken(request.body.token)
     //     .then(decodedToken => {
