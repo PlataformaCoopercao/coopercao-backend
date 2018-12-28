@@ -137,6 +137,7 @@ export const getPasseiosAgendados = functions.https.onRequest((request, response
     });
 });
 
+//envia {"ownerKey": } 
 export const getHistoricoCliente = functions.https.onRequest((request, response) => {
     if (request.method !== "POST") {
         response.status(400).send("Error");

@@ -27,7 +27,7 @@ export const getWalker = functions.https.onRequest((request,response) =>{
     //         response.status(400).send(error);
     //     })
 
-})
+});
 
 export const updateWalker = functions.https.onRequest((request, response) =>{
     const uid = request.body.uid;
@@ -52,4 +52,17 @@ export const updateWalker = functions.https.onRequest((request, response) =>{
     //     .catch(error => {
     //         response.status(400).send(error);
     //     })
-})
+});
+
+export const getPasseiosAberto = functions.https.onRequest((request, response) => {
+
+    db.ref('walk_unassigned').once("value")
+    .then(snapshot => {
+        const data = snapshot.val()
+        response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro buscando passeios em aberto:", error);
+        response.status(400).send(error)
+    }); 
+});
