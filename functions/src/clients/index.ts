@@ -136,3 +136,21 @@ export const getPasseiosAgendados = functions.https.onRequest((request, response
         response.status(400).send(error)
     });
 });
+
+export const getHistoricoCliente = functions.https.onRequest((request, response) => {
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+        // return 0
+    }
+    const ownerKey = request.body.ownerKey;
+
+    db.ref('walk_history').orderByChild('dog/owner').equalTo(ownerKey).once('value')
+    .then(snapshot => {
+        const data = snapshot.val()
+        response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando histórico de passeios:", error);
+        response.status(400).send(error)
+    });
+});
