@@ -66,3 +66,22 @@ export const getPasseiosAberto = functions.https.onRequest((request, response) =
         response.status(400).send(error)
     }); 
 });
+
+//RECEBE passeadorKey E RETORNA PASSEIOS ATIRBUIDOS A ESTE PASSEADOR
+export const getPasseiosAtribuidos = functions.https.onRequest((request, response) => {
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+        // return 0
+    }
+    const passeadorKey = request.body.passeadorKey;
+
+    db.ref('walk_assigned').orderByChild('walker').equalTo(passeadorKey).once('value')
+    .then(snapshot => {
+        const data = snapshot.val()
+        response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando passeios atribuidos ao passeador:", error);
+        response.status(400).send(error)
+    });
+});
