@@ -85,3 +85,22 @@ export const getPasseiosAtribuidos = functions.https.onRequest((request, respons
         response.status(400).send(error)
     });
 });
+
+//RECEBE passeadorKey E RETORNA PASSEIOS DO HISTORICO DESTE PASSEADOR
+export const getPasseiosHistorico = functions.https.onRequest((request, response) => {
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+        // return 0
+    }
+    const passeadorKey = request.body.passeadorKey;
+
+    db.ref('walk_history').orderByChild('walker').equalTo(passeadorKey).once('value')
+    .then(snapshot => {
+        const data = snapshot.val()
+        response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando passeios do histórico do passeador:", error);
+        response.status(400).send(error)
+    });
+});

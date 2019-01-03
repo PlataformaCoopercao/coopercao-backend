@@ -8,8 +8,8 @@ export {addTestDog,getTestDog, addDog, getListDog, deleteDog, updateDog}
 import {registerClient, getClient, updateClient, getPasseiosAgendados, getHistoricoCliente} from './clients/index'
 export {registerClient, getClient, updateClient, getPasseiosAgendados, getHistoricoCliente}
 
-import {getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos} from './walkers/index'
-export {getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos}
+import {getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico} from './walkers/index'
+export {getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico}
 
 import {newWalk} from './walks/index'
 export {newWalk}
