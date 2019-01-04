@@ -18,7 +18,8 @@ export const newWalk = functions.https.onRequest((request, response) =>{
         dog : walk.dog,
         date : walk.date,
         time : walk.time,
-        value : walk.value
+        value : walk.value,
+        walk_type : walk.walk_type
     })
     .then(() => {
         response.status(200).send('Walk addes successfully');
