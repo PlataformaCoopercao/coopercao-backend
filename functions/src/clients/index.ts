@@ -155,3 +155,44 @@ export const getHistoricoCliente = functions.https.onRequest((request, response)
         response.status(400).send(error)
     });
 });
+
+//RECEBE {"ownerKey", "mes", "ano"} e retorna todos os passeios de um cliente no mês no formato
+// [{passeios alocados}, {não alocados}, {historico}]
+export const getFaturaMensalCliente = functions.https.onRequest((request, response) => {
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+        // return 0
+    }
+    const ownerKey = request.body.ownerKey;
+    const mes = request.body.mes;
+    const ano = request.body.ano;
+    let pagamentos:any[] = [];
+
+    db.ref('walk_assigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    .then(snapshot => {
+        pagamentos[0] = snapshot.val()
+        //response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando passeios agendados alocados:", error);
+        response.status(400).send(error)
+    });
+    db.ref('walk_unassigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    .then(snapshot => {
+        pagamentos[1] = snapshot.val()
+        //response.send(data)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando passeios agendados não alocados:", error);
+        response.status(400).send(error)
+    });
+    db.ref('walk_history').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    .then(snapshot => {
+        pagamentos[2] = snapshot.val()
+        response.send(pagamentos)
+    })
+    .catch(function (error) {
+        console.log("Erro pesquisando histórico de passeios:", error);
+        response.status(400).send(error)
+    });
+});
