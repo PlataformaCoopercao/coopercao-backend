@@ -56,15 +56,35 @@ export const updateWalker = functions.https.onRequest((request, response) =>{
 
 export const getPasseiosAberto = functions.https.onRequest((request, response) => {
 
-    db.ref('walk_unassigned').once("value")
+
+    db.ref('walk_unassigned').once('value')
     .then(snapshot => {
-        const data = snapshot.val()
-        response.send(data)
+        let unassigned_walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            unassigned_walks.push(childData);
+        }))
+
+        response.status(200).send(unassigned_walks);
     })
-    .catch(function (error) {
-        console.log("Erro buscando passeios em aberto:", error);
-        response.status(400).send(error)
-    }); 
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+
+//     db.ref('walk_unassigned').once("value")
+//     .then(snapshot => {
+//         const data = snapshot.val()
+//         let walk_list = [];
+//         Object.keys(data).map(key =>{
+//             walk_list.push({[key]:data[key]})
+//         })
+//         response.send(walk_list);
+//     })
+//     .catch(function (error) {
+//         console.log("Erro buscando passeios em aberto:", error);
+//         response.status(400).send(error)
+// }); 
 });
 
 //RECEBE passeadorKey E RETORNA PASSEIOS ATIRBUIDOS A ESTE PASSEADOR
