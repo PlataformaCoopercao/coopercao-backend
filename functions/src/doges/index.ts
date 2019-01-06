@@ -77,15 +77,30 @@ export const getListDog = functions.https.onRequest((request, response) => {
     }
     const owner = request.body.owner;
 
-    db.ref('dogs').orderByChild("owner").equalTo(owner).once("value")
+    db.ref('dogs').orderByChild('owner').equalTo(owner).once('value')
     .then(snapshot => {
-        const data = snapshot.val()
-        response.send(data)
+        let dogs = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            dogs.push(childData);
+        }))
+
+        response.status(200).send(dogs);
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando cachorro(s):", error);
-        response.status(400).send(error)
-    }); 
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+
+    //db.ref('dogs').orderByChild("owner").equalTo(owner).once("value")
+    //.then(snapshot => {
+    //    const data = snapshot.val()
+   //     response.send(data)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando cachorro(s):", error);
+    //    response.status(400).send(error)
+    //}); 
 });
 
 export const deleteDog = functions.https.onRequest((request, response) => {

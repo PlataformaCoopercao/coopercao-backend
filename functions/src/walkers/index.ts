@@ -97,13 +97,28 @@ export const getPasseiosAtribuidos = functions.https.onRequest((request, respons
 
     db.ref('walk_assigned').orderByChild('walker').equalTo(passeadorKey).once('value')
     .then(snapshot => {
-        const data = snapshot.val()
-        response.send(data)
+        let assigned_walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            assigned_walks.push(childData);
+        }))
+
+        response.status(200).send(assigned_walks);
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando passeios atribuidos ao passeador:", error);
-        response.status(400).send(error)
-    });
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+
+    //db.ref('walk_assigned').orderByChild('walker').equalTo(passeadorKey).once('value')
+    //.then(snapshot => {
+    //    const data = snapshot.val()
+    //    response.send(data)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando passeios atribuidos ao passeador:", error);
+    //    response.status(400).send(error)
+    //});
 });
 
 //RECEBE passeadorKey E RETORNA PASSEIOS DO HISTORICO DESTE PASSEADOR
@@ -116,11 +131,26 @@ export const getPasseiosHistorico = functions.https.onRequest((request, response
 
     db.ref('walk_history').orderByChild('walker').equalTo(passeadorKey).once('value')
     .then(snapshot => {
-        const data = snapshot.val()
-        response.send(data)
+        let walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            walks.push(childData);
+        }))
+
+        response.status(200).send(walks);
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando passeios do histórico do passeador:", error);
-        response.status(400).send(error)
-    });
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+
+    //db.ref('walk_history').orderByChild('walker').equalTo(passeadorKey).once('value')
+    //.then(snapshot => {
+    //    const data = snapshot.val()
+    //    response.send(data)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando passeios do histórico do passeador:", error);
+    //    response.status(400).send(error)
+    //});
 });
