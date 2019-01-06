@@ -108,7 +108,7 @@ export const getClient = functions.https.onRequest((request, response) => {
 });
 
 export const getPasseiosAgendados = functions.https.onRequest((request, response) => {
-    //RETORNA UM [X, Y] ONDE X SÃO OS PASSEIOS AGENDADOS COM PASSEADORES ALOCADOS E Y SÃO OS SEM PASSEADORES ALOCADOS
+    //RETORNA UM [[X], [Y]] ONDE X SÃO OS PASSEIOS AGENDADOS COM PASSEADORES ALOCADOS E Y SÃO OS SEM PASSEADORES ALOCADOS
     //firebase serve --only functions
     if (request.method !== "POST") {
         response.status(400).send("Error");
@@ -117,24 +117,52 @@ export const getPasseiosAgendados = functions.https.onRequest((request, response
     const ownerKey = request.body.ownerKey;
     let data:any[] = [];
 
-    db.ref('walk_assigned').orderByChild("dog/owner").equalTo(ownerKey).once("value")
+    db.ref('walk_assigned').orderByChild('dog/owner').equalTo(ownerKey).once('value')
     .then(snapshot => {
-        data[0] = snapshot.val()
-        //response.send(data)
+        let assigned_walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            assigned_walks.push(childData);
+        }))
+        data[0] = assigned_walks;
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando passeios agendados:", error);
-        response.status(400).send(error)
-    });
-    db.ref('walk_unassigned').orderByChild("dog/owner").equalTo(ownerKey).once("value")
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+    db.ref('walk_unassigned').orderByChild('dog/owner').equalTo(ownerKey).once('value')
     .then(snapshot => {
-        data[1] = snapshot.val()
-        response.send(data)
+        let unassigned_walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            unassigned_walks.push(childData);
+        }))
+        data[1] = unassigned_walks;
+        response.send(data);
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando passeios agendados:", error);
-        response.status(400).send(error)
-    });
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+
+    //db.ref('walk_assigned').orderByChild("dog/owner").equalTo(ownerKey).once("value")
+    //.then(snapshot => {
+    //    data[0] = snapshot.val()
+    //    //response.send(data)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando passeios agendados:", error);
+    //    response.status(400).send(error)
+    //});
+    //db.ref('walk_unassigned').orderByChild("dog/owner").equalTo(ownerKey).once("value")
+    //.then(snapshot => {
+    //    data[1] = snapshot.val()
+    //    response.send(data)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando passeios agendados:", error);
+    //    response.status(400).send(error)
+    //});
 });
 
 //envia {"ownerKey": } 
@@ -147,13 +175,27 @@ export const getHistoricoCliente = functions.https.onRequest((request, response)
 
     db.ref('walk_history').orderByChild('dog/owner').equalTo(ownerKey).once('value')
     .then(snapshot => {
-        const data = snapshot.val()
-        response.send(data)
+        let walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            walks.push(childData);
+        }))
+        response.status(200).send(walks);
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando histórico de passeios:", error);
-        response.status(400).send(error)
-    });
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+
+    //db.ref('walk_history').orderByChild('dog/owner').equalTo(ownerKey).once('value')
+    //.then(snapshot => {
+    //    const data = snapshot.val()
+    //    response.send(data)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando histórico de passeios:", error);
+   //     response.status(400).send(error)
+   // });
 });
 
 //RECEBE {"ownerKey", "mes", "ano"} e retorna todos os passeios de um cliente no mês no formato
@@ -168,31 +210,72 @@ export const getFaturaMensalCliente = functions.https.onRequest((request, respon
     const ano = request.body.ano;
     let pagamentos:any[] = [];
 
-    db.ref('walk_assigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    db.ref('walk_assigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
     .then(snapshot => {
-        pagamentos[0] = snapshot.val()
-        //response.send(data)
+        let assigned_walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            assigned_walks.push(childData);
+        }))
+        pagamentos[0] = assigned_walks;
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando passeios agendados alocados:", error);
-        response.status(400).send(error)
-    });
-    db.ref('walk_unassigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+    db.ref('walk_unassigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
     .then(snapshot => {
-        pagamentos[1] = snapshot.val()
-        //response.send(data)
+        let unassigned_walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            unassigned_walks.push(childData);
+        }))
+        pagamentos[1] = unassigned_walks;
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando passeios agendados não alocados:", error);
-        response.status(400).send(error)
-    });
-    db.ref('walk_history').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+    db.ref('walk_history').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
     .then(snapshot => {
-        pagamentos[2] = snapshot.val()
-        response.send(pagamentos)
+        let walks = [];
+        snapshot.forEach((childSnapshot => {
+            let key = childSnapshot.key;
+            let childData = childSnapshot.val();
+            walks.push(childData);
+        }))
+        pagamentos[2] = walks;
+        response.send(pagamentos);
     })
-    .catch(function (error) {
-        console.log("Erro pesquisando histórico de passeios:", error);
-        response.status(400).send(error)
-    });
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+
+    //db.ref('walk_assigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    //.then(snapshot => {
+    //    pagamentos[0] = snapshot.val()
+    //    //response.send(data)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando passeios agendados alocados:", error);
+    //    response.status(400).send(error)
+    //});
+    //db.ref('walk_unassigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    //.then(snapshot => {
+    //    pagamentos[1] = snapshot.val()
+    //    //response.send(data)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando passeios agendados não alocados:", error);
+    //    response.status(400).send(error)
+    //});
+    //db.ref('walk_history').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
+    //.then(snapshot => {
+     //   pagamentos[2] = snapshot.val()
+    //    response.send(pagamentos)
+    //})
+    //.catch(function (error) {
+    //    console.log("Erro pesquisando histórico de passeios:", error);
+    //    response.status(400).send(error)
+    //});
 });
