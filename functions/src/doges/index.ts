@@ -45,7 +45,9 @@ export const addDog = functions.https.onRequest((request, response) => {
     const vet_name = request.body.vet_name;
     const vet_phone = request.body.vet_phone;
 
-    db.ref('dogs').push().set({
+    let myRef = db.ref('dogs').push();
+    myRef.set({
+        id:myRef.key,
         age: age,
         gender: gender,
         habits: habits,
