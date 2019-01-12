@@ -13,7 +13,9 @@ export const newWalk = functions.https.onRequest((request, response) =>{
 
     const walk = request.body.walk;
 
-    db.ref('walk_unassigned').push().set({
+    let myRef = db.ref('walk_unassigned').push();
+    myRef.set({
+        id : myRef.key,
         address : walk.adress,
         dog : walk.dog,
         date : walk.date,
@@ -39,7 +41,9 @@ export const assignWalk = functions.https.onRequest((request, response) =>{
     const walk = request.body.walk;
     const walker = request.body.walker;
 
-    db.ref('walk_assigned').push().set({
+    let myRef = db.ref('walk_assigned').push();
+    myRef.set({
+        id : myRef.key,
         address : walk.adress,
         dog : walk.dog,
         date : walk.date,
