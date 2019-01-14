@@ -11,8 +11,8 @@ export {registerClient, getClient, updateClient, getPasseiosAgendados, getHistor
 import {getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico} from './walkers/index'
 export {getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico}
 
-import {newWalk, assignWalk} from './walks/index'
-export {newWalk, assignWalk}
+import {newWalk, assignWalk,endWalk} from './walks/index'
+export {newWalk, assignWalk, endWalk}
 
 
 

@@ -19,7 +19,7 @@ export const registerClient = functions.https.onRequest((request, response) => {
     const photoUrl = request.body.photoUrl;
     const birth_date = request.body.birth_date;
     const cpf = request.body.cpf;
-    const adress = request.body.adress;
+    const address = request.body.address;
 
     auth.createUser({
             email: email,
@@ -40,11 +40,12 @@ export const registerClient = functions.https.onRequest((request, response) => {
                 phoneNumber: phoneNumber,
                 photoURL: photoUrl,
                 email: email,
-                adress: {
-                    cep: adress.cep,
-                    street: adress.street,
-                    num: adress.num,
-                    compl: adress.compl
+                address: {
+                    cep: address.cep,
+                    street: address.street,
+                    num: address.num,
+                    compl: address.compl,
+                    district : address.district
                 }
             })
         })
@@ -208,48 +209,54 @@ export const getFaturaMensalCliente = functions.https.onRequest((request, respon
     const ownerKey = request.body.ownerKey;
     const mes = request.body.mes;
     const ano = request.body.ano;
-    let pagamentos:any[] = [];
+    // const pagamentos:number[] = [];
+  
 
-    db.ref('walk_assigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
-    .then(snapshot => {
-        let assigned_walks = [];
-        snapshot.forEach((childSnapshot => {
-            let key = childSnapshot.key;
-            let childData = childSnapshot.val();
-            assigned_walks.push(childData);
-        }))
-        pagamentos[0] = assigned_walks;
-    })
-    .catch(error =>{
-        response.status(400).send(error);
-    })
-    db.ref('walk_unassigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
-    .then(snapshot => {
-        let unassigned_walks = [];
-        snapshot.forEach((childSnapshot => {
-            let key = childSnapshot.key;
-            let childData = childSnapshot.val();
-            unassigned_walks.push(childData);
-        }))
-        pagamentos[1] = unassigned_walks;
-    })
-    .catch(error =>{
-        response.status(400).send(error);
-    })
     db.ref('walk_history').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
     .then(snapshot => {
-        let walks = [];
+        let pagamentosAvulsos = 0;
+        let pagamentosPlano = 0;
         snapshot.forEach((childSnapshot => {
             let key = childSnapshot.key;
             let childData = childSnapshot.val();
-            walks.push(childData);
+            if(childData.walk_type === 'separate'){
+                pagamentosAvulsos += childData.value;
+            }else{
+                pagamentosPlano += childData.value;
+            }
         }))
-        pagamentos[2] = walks;
-        response.send(pagamentos);
+        response.status(200).send({pagamentosAvulsos,pagamentosPlano});
     })
     .catch(error =>{
         response.status(400).send(error);
     })
+    // db.ref('walk_history').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
+    // .then(snapshot => {
+    //     let unassigned_walks = [];
+    //     snapshot.forEach((childSnapshot => {
+    //         let key = childSnapshot.key;
+    //         let childData = childSnapshot.val();
+    //         unassigned_walks.push(childData);
+    //     }))
+    //     pagamentos[1] = unassigned_walks;
+    // })
+    // .catch(error =>{
+    //     response.status(400).send(error);
+    // })
+    // db.ref('walk_history').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
+    // .then(snapshot => {
+    //     let walks = [];
+    //     snapshot.forEach((childSnapshot => {
+    //         let key = childSnapshot.key;
+    //         let childData = childSnapshot.val();
+    //         walks.push(childData);
+    //     }))
+    //     pagamentos[2] = walks;
+    //     response.send(pagamentos);
+    // })
+    // .catch(error =>{
+    //     response.status(400).send(error);
+    // })
 
     //db.ref('walk_assigned').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once("value")
     //.then(snapshot => {
