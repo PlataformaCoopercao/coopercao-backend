@@ -4,8 +4,65 @@ import {
     db
 } from '../db/index';
 
+
+export const registerWalker = functions.https.onRequest((request,response) =>{
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+    }
+
+    const email = request.body.email;
+    const pass = request.body.pass;
+    const phoneNumber = request.body.phoneNumber;
+    const name = request.body.name;
+    const photoUrl = request.body.photoUrl;
+    const cpf = request.body.cpf;
+    const address = request.body.address;
+    const areas = request.body.areas;
+    const profession = request.body.profession;
+    const civilState = request.body.civilState
+
+    auth.createUser({
+        email: email,
+        emailVerified: false,
+        phoneNumber: phoneNumber,
+        password: pass,
+        displayName: name,
+        photoURL: photoUrl,
+        disabled: false
+    })
+    .then(userRecord => {
+        console.log("Successfully created new walker:", userRecord.uid);
+        return db.ref('walkers/' + userRecord.uid).set({
+            name: name,
+            cpf: cpf,
+            phoneNumber: phoneNumber,
+            photoURL: photoUrl,
+            email: email,
+            areas : areas,
+            profession : profession,
+            civilState : civilState,
+            score : 0,
+            accumulated_score : 0,
+            total_walks : 0,
+            address: {
+                cep: address.cep,
+                street: address.street,
+                num: address.num,
+                compl: address.compl,
+                district : address.district
+            }
+        })
+    })
+    .then(() => {
+        response.status(200).send("Successfully created new user profile");
+    })
+    .catch(function (error) {
+        response.status(400).send(error)
+    });
+
+})
+
 export const getWalker = functions.https.onRequest((request,response) =>{
-    console.log('hue')
 
     const uid = request.body.uid;
     db.ref('walkers/' + uid)
@@ -144,13 +201,41 @@ export const getPasseiosHistorico = functions.https.onRequest((request, response
         response.status(400).send(error);
     })
 
-    //db.ref('walk_history').orderByChild('walker').equalTo(passeadorKey).once('value')
-    //.then(snapshot => {
-    //    const data = snapshot.val()
-    //    response.send(data)
-    //})
-    //.catch(function (error) {
-    //    console.log("Erro pesquisando passeios do histórico do passeador:", error);
-    //    response.status(400).send(error)
-    //});
+});
+
+export const walkerScore = functions.https.onRequest((request,response) =>{
+    if (request.method !== "POST") {
+        response.status(400).send("Error");
+    }
+
+    const id = request.body.id;
+    const walker_score = request.body.score;
+
+    let total_walks;
+    let accumulated_score;
+
+    db.ref('walkers/' + id).once('value')
+    .then(snapshot => {
+        const walker = snapshot.val();
+        total_walks = walker.total_walks;
+        accumulated_score = walker.accumulated_score;
+
+    })
+    .then(() =>{
+        const newTotal_walks = total_walks + 1;
+        const newAccumulated_Score = accumulated_score + walker_score;
+        const newScore = (newAccumulated_Score/newTotal_walks).toFixed(1);
+
+       return db.ref('walkers/' + id).update({
+                total_walks: newTotal_walks,
+                accumulated_score : newAccumulated_Score,
+                score : newScore
+        })
+    })
+    .then(() => {
+        response.status(200).send('Score updated');
+    })
+    .catch(error => {
+        response.status(400).send(error);
+    })
 });

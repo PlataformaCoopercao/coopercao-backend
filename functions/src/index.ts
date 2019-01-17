@@ -5,11 +5,11 @@
 import {addTestDog,getTestDog, addDog, getListDog, deleteDog, updateDog} from './doges/index'
 export {addTestDog,getTestDog, addDog, getListDog, deleteDog, updateDog}
 
-import {registerClient, getClient, updateClient, getPasseiosAgendados, getHistoricoCliente, getFaturaMensalCliente} from './clients/index'
-export {registerClient, getClient, updateClient, getPasseiosAgendados, getHistoricoCliente, getFaturaMensalCliente}
+import {registerClient, getClient, getAllClients,updateClient, getPasseiosAgendados, getHistoricoCliente, getFaturaMensalCliente} from './clients/index'
+export {registerClient, getClient, getAllClients,updateClient, getPasseiosAgendados, getHistoricoCliente, getFaturaMensalCliente}
 
-import {getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico} from './walkers/index'
-export {getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico}
+import {registerWalker,getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico, walkerScore} from './walkers/index'
+export {registerWalker,getWalker, updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico, walkerScore}
 
 import {newWalk, assignWalk,endWalk} from './walks/index'
 export {newWalk, assignWalk, endWalk}

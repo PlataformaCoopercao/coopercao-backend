@@ -3,70 +3,76 @@ import {
     auth,
     db
 } from '../db/index';
-import { ClientResponse } from 'http';
 
-export const newWalk = functions.https.onRequest((request, response) =>{
-    console.log('lol');
+export const newWalk = functions.https.onRequest((request, response) => {
 
-    if(request.method !== 'POST'){
+    if (request.method !== 'POST') {
         response.status(400).send('Error');
     }
 
     const walk = request.body.walk;
 
-    let myRef = db.ref('walk_unassigned').push();
+    const myRef = db.ref('walk_unassigned').push();
     myRef.set({
-        id : myRef.key,
-        address : walk.address,
-        dog : walk.dog,
-        date : walk.date,
-        time : walk.time,
-        value : walk.value,
-        walk_type : walk.walk_type,
-        owner_month_year : walk.owner_month_year 
+        id: myRef.key,
+        address: walk.address,
+        dog: walk.dog,
+        date: walk.date,
+        obs_client:walk.obs_client,
+        time: walk.time,
+        value: walk.value,
+        walk_type: walk.walk_type,
+        owner_month_year: walk.owner_month_year
     })
-    .then(() => {
-        response.status(200).send('Walk addes successfully');
-    })
-    .catch(error => {
-        response.status(400).send(error);
-    })
+        .then(() => {
+            response.status(200).send('Walk addes successfully');
+        })
+        .catch(error => {
+            response.status(400).send(error);
+        })
 })
 
-export const assignWalk = functions.https.onRequest((request, response) =>{
+export const assignWalk = functions.https.onRequest((request, response) => {
 
-    if(request.method !== 'POST'){
+    if (request.method !== 'POST') {
         response.status(400).send('Error');
     }
 
     const walk = request.body.walk;
     const walker = request.body.walker;
 
-    let myRef = db.ref('walk_assigned').push();
-    myRef.set({
-        id : myRef.key,
-        address : walk.address,
-        dog : walk.dog,
-        date : walk.date,
-        time : walk.time,
-        value : walk.value,
-        walk_type : walk.walk_type,
-        owner_month_year : walk.owner_month_year,
-        walker : walker
-    })
-    .then(() => {
-      return db.ref('walk_unassigned/'+ walk.id).remove()
-    })
-    .then(() => {
-        response.status(200).send('the walk was assigned successfully');
-    })
-    .catch(error => {
-        response.status(400).send(error);
-    })
+    db.ref('walkers/' + walker).once('value')
+        .then((snapshot) => {
+            return snapshot.val();
+        })
+        .then(walkerData => {
+            const myRef = db.ref('walk_assigned').push();
+            return myRef.set({
+                id: myRef.key,
+                address: walk.address,
+                dog: walk.dog,
+                date: walk.date,
+                time: walk.time,
+                obs_client:walk.obs_client,
+                value: walk.value,
+                walk_type: walk.walk_type,
+                owner_month_year: walk.owner_month_year,
+                walker: walkerData
+            })
+        })
+        .then(() => {
+            return db.ref('walk_unassigned/' + walk.id).remove()
+        })
+        .then(() => {
+            response.status(200).send('the walk was assigned successfully');
+        })
+        .catch(error => {
+            response.status(400).send('Failed to assign walk');
+        })
 })
 
-export const endWalk = functions.https.onRequest((request, response) =>{
-    if(request.method != 'POST'){
+export const endWalk = functions.https.onRequest((request, response) => {
+    if (request.method != 'POST') {
         response.status(400).send('Error, request must be POST');
     }
 
@@ -78,28 +84,31 @@ export const endWalk = functions.https.onRequest((request, response) =>{
     const route = request.body.route;
     const obs = request.body.obs;
 
-    let myRef = db.ref('walk_history').push();
+    const myRef = db.ref('walk_history').push();
     myRef.set({
         id: myRef.key,
-        address : walk.address,
-        dog : walk.dog,
-        date : walk.date,
-        time : walk.time,
-        value : walk.value,
-        walk_type : walk.walk_type,
-        owner_month_year : walk.owner_month_year,
-        walker : walk.walker,
+        address: walk.address,
+        dog: walk.dog,
+        date: walk.date,
+        time: walk.time,
+        value: walk.value,
+        walk_type: walk.walk_type,
+        owner_month_year: walk.owner_month_year,
+        walker: walk.walker,
         activities: activities,
         photoUrls: photoUrls,
-        walk_duration : walk_duration,
-        feedback:feedback,
-        route : route,
+        walk_duration: walk_duration,
+        feedback: feedback,
+        route: route,
         obs: obs
     })
-    .then(() => {
-        response.status(200).send('The walk ended successfully');
-    })
-    .catch(error =>{
-        response.status(500).send(error);
-    })
+        .then(() => {
+            return db.ref('walk_assigned/' + walk.id).remove()
+        })
+        .then(() => {
+            response.status(200).send('The walk ended successfully');
+        })
+        .catch(error => {
+            response.status(500).send(error);
+        })
 })

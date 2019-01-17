@@ -1,28 +1,28 @@
 import * as functions from 'firebase-functions';
-import {db} from '../db/index';
+import { db } from '../db/index';
 
 export const addTestDog = functions.https.onRequest((request, response) => {
-    db.ref('dog/3').set({nome:'jake',idade:10})
-    .then(() =>{
-        response.status(200).send("Dog adicionado com sucesso");
-    })
-    .catch(error => {
-        response.status(500).send('Deu o erro ${error}');
-    })
+    db.ref('dog/3').set({ nome: 'jake', idade: 10 })
+        .then(() => {
+            response.status(200).send("Dog adicionado com sucesso");
+        })
+        .catch(error => {
+            response.status(500).send('Deu o erro ${error}');
+        })
 });
 
 export const getTestDog = functions.https.onRequest((request, response) => {
     db.ref('dog').once('value')
-    .then(snapshot => {
-        const dog = snapshot.val();
-        return dog;
-    })
-    .then(dog =>{
-        response.status(200).send(dog);
-    })
-    .catch(error => {
-        response.status(500).send("Deu o erro ${error}")
-    }) 
+        .then(snapshot => {
+            const dog = snapshot.val();
+            return dog;
+        })
+        .then(dog => {
+            response.status(200).send(dog);
+        })
+        .catch(error => {
+            response.status(500).send("Deu o erro ${error}")
+        })
 });
 
 export const addDog = functions.https.onRequest((request, response) => {
@@ -47,7 +47,7 @@ export const addDog = functions.https.onRequest((request, response) => {
 
     let myRef = db.ref('dogs').push();
     myRef.set({
-        id:myRef.key,
+        id: myRef.key,
         age: age,
         gender: gender,
         habits: habits,
@@ -63,13 +63,13 @@ export const addDog = functions.https.onRequest((request, response) => {
         vet_name: vet_name,
         vet_phone: vet_phone
     })
-    .then(() => {
-        response.status(200).send("Cão cadastrado com sucesso");
-    })
-    .catch(function (error) {
-        console.log("Erro cadastrando cachorro:", error);
-        response.status(400).send(error)
-    }); 
+        .then(() => {
+            response.status(200).send("Cão cadastrado com sucesso");
+        })
+        .catch(function (error) {
+            console.log("Erro cadastrando cachorro:", error);
+            response.status(400).send(error)
+        });
 });
 
 export const getListDog = functions.https.onRequest((request, response) => {
@@ -80,24 +80,24 @@ export const getListDog = functions.https.onRequest((request, response) => {
     const owner = request.body.owner;
 
     db.ref('dogs').orderByChild('owner').equalTo(owner).once('value')
-    .then(snapshot => {
-        let dogs = [];
-        snapshot.forEach((childSnapshot => {
-            let key = childSnapshot.key;
-            let childData = childSnapshot.val();
-            dogs.push(childData);
-        }))
+        .then(snapshot => {
+            let dogs = [];
+            snapshot.forEach((childSnapshot => {
+                let key = childSnapshot.key;
+                let childData = childSnapshot.val();
+                dogs.push(childData);
+            }))
 
-        response.status(200).send(dogs);
-    })
-    .catch(error =>{
-        response.status(400).send(error);
-    })
+            response.status(200).send(dogs);
+        })
+        .catch(error => {
+            response.status(400).send(error);
+        })
 
     //db.ref('dogs').orderByChild("owner").equalTo(owner).once("value")
     //.then(snapshot => {
     //    const data = snapshot.val()
-   //     response.send(data)
+    //     response.send(data)
     //})
     //.catch(function (error) {
     //    console.log("Erro pesquisando cachorro(s):", error);
@@ -113,13 +113,13 @@ export const deleteDog = functions.https.onRequest((request, response) => {
     const dogKey = request.body.dogKey;
 
     db.ref('dogs/' + dogKey).remove()
-    .then(() => {
-        response.status(200).send("Cão removido com sucesso");
-    })
-    .catch(function (error) {
-        console.log("Erro removendo cachorro:", error);
-        response.status(400).send(error)
-    }); 
+        .then(() => {
+            response.status(200).send("Cão removido com sucesso");
+        })
+        .catch(function (error) {
+            console.log("Erro removendo cachorro:", error);
+            response.status(400).send(error)
+        });
 });
 
 export const updateDog = functions.https.onRequest((request, response) => {
@@ -160,11 +160,11 @@ export const updateDog = functions.https.onRequest((request, response) => {
         vet_name: vet_name,
         vet_phone: vet_phone
     })
-    .then(() => {
-        response.status(200).send("Cão atualizado com sucesso");
-    })
-    .catch(function (error) {
-        console.log("Erro atualizando cachorro:", error);
-        response.status(400).send(error)
-    }); 
+        .then(() => {
+            response.status(200).send("Cão atualizado com sucesso");
+        })
+        .catch(function (error) {
+            console.log("Erro atualizando cachorro:", error);
+            response.status(400).send(error)
+        });
 });
