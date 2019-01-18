@@ -110,9 +110,9 @@ export const deleteDog = functions.https.onRequest((request, response) => {
         response.status(400).send("Error");
         // return 0
     }
-    const dogKey = request.body.dogKey;
+    const dog_id = request.body.dog_id;
 
-    db.ref('dogs/' + dogKey).remove()
+    db.ref('dogs/' + dog_id).remove()
         .then(() => {
             response.status(200).send("Cão removido com sucesso");
         })
@@ -127,39 +127,9 @@ export const updateDog = functions.https.onRequest((request, response) => {
         response.status(400).send("Error");
         // return 0
     }
-    const dogKey = request.body.dogKey;
+    const dog = request.body.dog;
 
-    const age = request.body.age;
-    const gender = request.body.gender;
-    const habits = request.body.habits;
-    const interaction_dogs = request.body.interaction_dogs;
-    const interaction_external = request.body.interaction_external;
-    const interaction_people = request.body.interaction_people;
-    const name = request.body.name;
-    const obs = request.body.obs;
-    const owner = request.body.owner;
-    const photoUrl = request.body.photoUrl;
-    const port = request.body.port;
-    const race = request.body.race;
-    const vet_name = request.body.vet_name;
-    const vet_phone = request.body.vet_phone;
-
-    db.ref('dogs/' + dogKey).set({
-        age: age,
-        gender: gender,
-        habits: habits,
-        interaction_dogs: interaction_dogs,
-        interaction_external: interaction_external,
-        interaction_people: interaction_people,
-        name: name,
-        obs: obs,
-        owner: owner,
-        photoUrl: photoUrl,
-        port: port,
-        race: race,
-        vet_name: vet_name,
-        vet_phone: vet_phone
-    })
+    db.ref('dogs/' + dog.id).update(dog)
         .then(() => {
             response.status(200).send("Cão atualizado com sucesso");
         })
