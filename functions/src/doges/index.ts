@@ -39,6 +39,7 @@ export const addDog = functions.https.onRequest((request, response) => {
     const name = request.body.name;
     const obs = request.body.obs;
     const owner = request.body.owner;
+    const owner_data = request.body.owner_data;
     const photoUrl = request.body.photoUrl;
     const port = request.body.port;
     const race = request.body.race;
@@ -57,6 +58,7 @@ export const addDog = functions.https.onRequest((request, response) => {
         name: name,
         obs: obs,
         owner: owner,
+        owner_data: owner_data,
         photoUrl: photoUrl,
         port: port,
         race: race,

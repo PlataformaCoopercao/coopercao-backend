@@ -70,9 +70,6 @@ export const registerWalker = functions.https.onRequest((request, response) => {
             });
 
     })
-
-
-
 })
 
 export const getAllWalkers = functions.https.onRequest((request, response) => {
@@ -142,21 +139,22 @@ export const updateWalker = functions.https.onRequest((request, response) => {
 
 export const getPasseiosAberto = functions.https.onRequest((request, response) => {
 
-
-    db.ref('walk_unassigned').once('value')
-        .then(snapshot => {
-            let unassigned_walks = [];
-            snapshot.forEach((childSnapshot => {
-                let key = childSnapshot.key;
-                let childData = childSnapshot.val();
-                unassigned_walks.push(childData);
-            }))
-
-            response.status(200).send(unassigned_walks);
-        })
-        .catch(error => {
-            response.status(400).send(error);
-        })
+    cors(request, response, () => {
+        db.ref('walk_unassigned').once('value')
+            .then(snapshot => {
+                let unassigned_walks = [];
+                snapshot.forEach((childSnapshot => {
+                    let key = childSnapshot.key;
+                    let childData = childSnapshot.val();
+                    unassigned_walks.push(childData);
+                }))
+    
+                response.status(200).send(unassigned_walks);
+            })
+            .catch(error => {
+                response.status(400).send(error);
+            })
+    })
 
     //     db.ref('walk_unassigned').once("value")
     //     .then(snapshot => {
@@ -208,14 +206,14 @@ export const getPasseiosAtribuidos = functions.https.onRequest((request, respons
 });
 
 //RECEBE passeadorKey E RETORNA PASSEIOS DO HISTORICO DESTE PASSEADOR
-export const getPasseiosHistorico = functions.https.onRequest((request, response) => {
+export const getWalkerHistory = functions.https.onRequest((request, response) => {
     if (request.method !== "POST") {
         response.status(400).send("Error");
         // return 0
     }
-    const passeadorKey = request.body.passeadorKey;
+    const walker_id = request.body.walker_id;
 
-    db.ref('walk_history').orderByChild('walker').equalTo(passeadorKey).once('value')
+    db.ref('walk_history').orderByChild('walker').equalTo(walker_id).once('value')
         .then(snapshot => {
             let walks = [];
             snapshot.forEach((childSnapshot => {

@@ -8,12 +8,12 @@ export {addTestDog,getTestDog, addDog, getListDog, deleteDog, updateDog}
 import {registerClient, getClient, getAllClients,updateClient, getPasseiosAgendados, getHistoricoCliente, getFaturaMensalCliente} from './clients/index'
 export {registerClient, getClient, getAllClients,updateClient, getPasseiosAgendados, getHistoricoCliente, getFaturaMensalCliente}
 
-import {registerWalker,getWalker, getAllWalkers,updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico, walkerScore} from './walkers/index'
-export {registerWalker,getWalker, getAllWalkers,updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getPasseiosHistorico, walkerScore}
+import {registerWalker,getWalker, getAllWalkers,updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getWalkerHistory, walkerScore} from './walkers/index'
+export {registerWalker,getWalker, getAllWalkers,updateWalker, getPasseiosAberto, getPasseiosAtribuidos, getWalkerHistory, walkerScore}
 
-import {newWalk, assignWalk,endWalk} from './walks/index'
-export {newWalk, assignWalk, endWalk}
+import {newWalk, assignWalk,endWalk, walkFeedback} from './walks/index'
+export {newWalk, assignWalk, endWalk, walkFeedback}
 
-
-
+import {getAreas, getWalksByMonthYear, getWalkHistory, getMonthFinance} from './general/index'
+export {getAreas, getWalksByMonthYear, getWalkHistory, getMonthFinance}
 

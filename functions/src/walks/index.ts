@@ -4,6 +4,7 @@ import {
     db
 } from '../db/index';
 
+
 export const newWalk = functions.https.onRequest((request, response) => {
 
     if (request.method !== 'POST') {
@@ -14,16 +15,16 @@ export const newWalk = functions.https.onRequest((request, response) => {
 
     const myRef = db.ref('walk_unassigned').push();
     myRef.set({
-        id: myRef.key,
-        address: walk.address,
-        dog: walk.dog,
-        date: walk.date,
-        obs_client:walk.obs_client,
-        time: walk.time,
-        value: walk.value,
-        walk_type: walk.walk_type,
-        owner_month_year: walk.owner_month_year
-    })
+            id: myRef.key,
+            address: walk.address,
+            dog: walk.dog,
+            date: walk.date,
+            obs_client: walk.obs_client,
+            time: walk.time,
+            value: walk.value,
+            walk_type: walk.walk_type,
+            owner_month_year: walk.owner_month_year
+        })
         .then(() => {
             response.status(200).send('Walk addes successfully');
         })
@@ -53,7 +54,7 @@ export const assignWalk = functions.https.onRequest((request, response) => {
                 dog: walk.dog,
                 date: walk.date,
                 time: walk.time,
-                obs_client:walk.obs_client,
+                obs_client: walk.obs_client,
                 value: walk.value,
                 walk_type: walk.walk_type,
                 owner_month_year: walk.owner_month_year,
@@ -77,31 +78,27 @@ export const endWalk = functions.https.onRequest((request, response) => {
     }
 
     const walk = request.body.walk;
-    const activities = request.body.activities;
-    const photoUrls = request.body.photoUrls;
     const walk_duration = request.body.walk_duration;
-    const feedback = request.body.feedback;
     const route = request.body.route;
-    const obs = request.body.obs;
 
     const myRef = db.ref('walk_history').push();
     myRef.set({
-        id: myRef.key,
-        address: walk.address,
-        dog: walk.dog,
-        date: walk.date,
-        time: walk.time,
-        value: walk.value,
-        walk_type: walk.walk_type,
-        owner_month_year: walk.owner_month_year,
-        walker: walk.walker,
-        activities: activities,
-        photoUrls: photoUrls,
-        walk_duration: walk_duration,
-        feedback: feedback,
-        route: route,
-        obs: obs
-    })
+            id: myRef.key,
+            address: walk.address,
+            dog: walk.dog,
+            date: walk.date,
+            time: walk.time,
+            value: walk.value,
+            walk_type: walk.walk_type,
+            owner_month_year: walk.owner_month_year,
+            walker: walk.walker,
+            //activities: activities,
+            //photoUrls: photoUrls,
+            walk_duration: walk_duration,
+            //feedback: feedback,
+            route: route,
+            //obs: obs
+        })
         .then(() => {
             return db.ref('walk_assigned/' + walk.id).remove()
         })
@@ -111,4 +108,31 @@ export const endWalk = functions.https.onRequest((request, response) => {
         .catch(error => {
             response.status(500).send(error);
         })
+})
+
+export const walkFeedback = functions.https.onRequest((request, response) => {
+    if (request.method != 'POST') {
+        response.status(400).send('Error, request must be POST');
+    }
+
+    const walk_id = request.body.walk_id;
+    const photoUrls = request.body.photoUrls;
+    const obs = request.body.obs;
+    const feedback = request.body.feedback;
+    const activities = request.body.activities;
+
+    let updates ={}
+    updates['/walk_history/' + walk_id + '/photoUrls'] = photoUrls;
+    updates['/walk_history/' + walk_id + '/obs'] = obs;
+    updates['/walk_history/' + walk_id + '/feedback'] = feedback;
+    updates['/walk_history/' + walk_id + '/activities'] = activities;
+
+    db.ref().update(updates)
+    .then(() =>{
+        response.status(200).send('Histórico atualizado com sucesso');
+    })
+    .catch(error => {
+        response.status(400).send(error);
+    })
+
 })
