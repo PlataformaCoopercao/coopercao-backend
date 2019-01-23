@@ -8,10 +8,6 @@ const cors = require('cors')({ origin: true });
 
 export const registerWalker = functions.https.onRequest((request, response) => {
 
-    response.set('Access-Control-Allow-Headers', 'content-type');
-    response.set('Access-Control-Allow-Origin', '*');
-    response.set('Access-Controll-Allow-Methods', 'OPTIONS,POST');
-
     cors(request, response, () => {
         if (request.method !== "POST") {
             response.status(400).send("Error");
@@ -44,6 +40,7 @@ export const registerWalker = functions.https.onRequest((request, response) => {
                 return db.ref('walkers/' + userRecord.uid).set({
                     name: name,
                     cpf: cpf,
+                    id: userRecord.uid,
                     phoneNumber: phoneNumber,
                     photoURL: photoUrl,
                     email: email,
@@ -73,25 +70,26 @@ export const registerWalker = functions.https.onRequest((request, response) => {
 })
 
 export const getAllWalkers = functions.https.onRequest((request, response) => {
-    response.set('Access-Control-Allow-Origin', '*');
-    response.set('Access-Controll-Allow-Methods', 'GET');
-
-    db.ref('walkers').once('value', snapshot => {
-        const walkersList = [];
-        snapshot.forEach((childSnapshot => {
-            walkersList.push(childSnapshot);
-        }))
-        response.status(200).send(walkersList)
-    })
-        .catch(error => {
-            response.status(400).send(error);
+    
+    cors(request, response, () => {
+        db.ref('walkers').once('value', snapshot => {
+            const walkersList = [];
+            snapshot.forEach((childSnapshot => {
+                walkersList.push(childSnapshot);
+            }))
+            response.status(200).send(walkersList)
         })
+            .catch(error => {
+                response.status(400).send(error);
+            })
+    })
+
 })
 
 export const getWalker = functions.https.onRequest((request, response) => {
 
-    const uid = request.body.uid;
-    db.ref('walkers/' + uid)
+    const id = request.body.id;
+    db.ref('walkers/' + id)
         .once('value', snapshot => {
             response.status(200).send(snapshot.val());
         })
@@ -113,10 +111,10 @@ export const getWalker = functions.https.onRequest((request, response) => {
 });
 
 export const updateWalker = functions.https.onRequest((request, response) => {
-    const uid = request.body.uid;
+    
     const walker = request.body.walker;
 
-    db.ref('walkers/' + uid).update(walker)
+    db.ref('walkers/' + walker.id).update(walker)
         .then(() => {
             response.status(200).send('user updated succesfully');
         })
@@ -137,15 +135,14 @@ export const updateWalker = functions.https.onRequest((request, response) => {
     //     })
 });
 
-export const getPasseiosAberto = functions.https.onRequest((request, response) => {
+export const getUnassignedWalks = functions.https.onRequest((request, response) => {
 
     cors(request, response, () => {
         db.ref('walk_unassigned').once('value')
             .then(snapshot => {
-                let unassigned_walks = [];
+                const unassigned_walks = [];
                 snapshot.forEach((childSnapshot => {
-                    let key = childSnapshot.key;
-                    let childData = childSnapshot.val();
+                    const childData = childSnapshot.val();
                     unassigned_walks.push(childData);
                 }))
     
@@ -172,19 +169,18 @@ export const getPasseiosAberto = functions.https.onRequest((request, response) =
 });
 
 //RECEBE passeadorKey E RETORNA PASSEIOS ATIRBUIDOS A ESTE PASSEADOR
-export const getPasseiosAtribuidos = functions.https.onRequest((request, response) => {
+export const getAssignedWalks = functions.https.onRequest((request, response) => {
     if (request.method !== "POST") {
         response.status(400).send("Error");
         // return 0
     }
-    const passeadorKey = request.body.passeadorKey;
+    const walker_id = request.body.walker_id;
 
-    db.ref('walk_assigned').orderByChild('walker').equalTo(passeadorKey).once('value')
+    db.ref('walk_assigned').orderByChild('walker').equalTo(walker_id).once('value')
         .then(snapshot => {
-            let assigned_walks = [];
+            const assigned_walks = [];
             snapshot.forEach((childSnapshot => {
-                let key = childSnapshot.key;
-                let childData = childSnapshot.val();
+                const childData = childSnapshot.val();
                 assigned_walks.push(childData);
             }))
 
@@ -213,12 +209,11 @@ export const getWalkerHistory = functions.https.onRequest((request, response) =>
     }
     const walker_id = request.body.walker_id;
 
-    db.ref('walk_history').orderByChild('walker').equalTo(walker_id).once('value')
+    db.ref('walk_history').orderByChild('walker/id').equalTo(walker_id).once('value')
         .then(snapshot => {
-            let walks = [];
+            const walks = [];
             snapshot.forEach((childSnapshot => {
-                let key = childSnapshot.key;
-                let childData = childSnapshot.val();
+                const childData = childSnapshot.val();
                 walks.push(childData);
             }))
 
@@ -246,7 +241,6 @@ export const walkerScore = functions.https.onRequest((request, response) => {
             const walker = snapshot.val();
             total_walks = walker.total_walks;
             accumulated_score = walker.accumulated_score;
-
         })
         .then(() => {
             const newTotal_walks = total_walks + 1;

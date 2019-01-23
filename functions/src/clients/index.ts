@@ -61,10 +61,10 @@ export const registerClient = functions.https.onRequest((request, response) => {
 
 export const updateClient = functions.https.onRequest((request, response) => {
 
-    const uid = request.body.uid;
+    const id = request.body.id;
     const client = request.body.client;
 
-    db.ref('clients/' + uid).update(client)
+    db.ref('clients/' + id).update(client)
     .then(() => {
         response.status(200).send('user updated succesfully');
     })
@@ -103,8 +103,8 @@ export const getAllClients = functions.https.onRequest((request, response) =>{
 
 export const getClient = functions.https.onRequest((request, response) => {
 
-    const uid = request.body.uid;
-    db.ref('clients/' + uid)
+    const id = request.body.id;
+    db.ref('clients/' + id)
         .once('value', snapshot => {
             response.status(200).send(snapshot.val());
         })
@@ -125,17 +125,17 @@ export const getClient = functions.https.onRequest((request, response) => {
 
 });
 
-export const getPasseiosAgendados = functions.https.onRequest((request, response) => {
+export const clientScheduledWalks = functions.https.onRequest((request, response) => {
     //RETORNA UM [[X], [Y]] ONDE X SÃO OS PASSEIOS AGENDADOS COM PASSEADORES ALOCADOS E Y SÃO OS SEM PASSEADORES ALOCADOS
     //firebase serve --only functions
     if (request.method !== "POST") {
         response.status(400).send("Error");
         // return 0
     }
-    const ownerKey = request.body.ownerKey;
+    const owner_id = request.body.owner_id;
     const data:any[] = [];
 
-    db.ref('walk_assigned').orderByChild('dog/owner').equalTo(ownerKey).once('value')
+    db.ref('walk_assigned').orderByChild('dog/owner').equalTo(owner_id).once('value')
     .then(snapshot => {
         const assigned_walks = [];
         snapshot.forEach((childSnapshot => {
@@ -147,7 +147,7 @@ export const getPasseiosAgendados = functions.https.onRequest((request, response
     .catch(error =>{
         response.status(400).send(error);
     })
-    db.ref('walk_unassigned').orderByChild('dog/owner').equalTo(ownerKey).once('value')
+    db.ref('walk_unassigned').orderByChild('dog/owner').equalTo(owner_id).once('value')
     .then(snapshot => {
         const unassigned_walks = [];
         snapshot.forEach((childSnapshot => {
@@ -163,14 +163,14 @@ export const getPasseiosAgendados = functions.https.onRequest((request, response
 });
 
 //envia {"ownerKey": } 
-export const getHistoricoCliente = functions.https.onRequest((request, response) => {
+export const clientWalkHistory = functions.https.onRequest((request, response) => {
     if (request.method !== "POST") {
         response.status(400).send("Error");
         // return 0
     }
-    const ownerKey = request.body.ownerKey;
+    const owner_id = request.body.owner_id;
 
-    db.ref('walk_history').orderByChild('dog/owner').equalTo(ownerKey).once('value')
+    db.ref('walk_history').orderByChild('dog/owner').equalTo(owner_id).once('value')
     .then(snapshot => {
         const walks = [];
         snapshot.forEach((childSnapshot => {
@@ -184,16 +184,16 @@ export const getHistoricoCliente = functions.https.onRequest((request, response)
     })
 });
 
-export const getFaturaMensalCliente = functions.https.onRequest((request, response) => {
+export const clientBill = functions.https.onRequest((request, response) => {
     if (request.method !== "POST") {
         response.status(400).send("Error");
     }
-    const ownerKey = request.body.ownerKey;
-    const mes = request.body.mes;
-    const ano = request.body.ano;
+    const owner_id = request.body.owner_id;
+    const month = request.body.month;
+    const year = request.body.year;
   
 
-    db.ref('walk_history').orderByChild("owner:month:year").equalTo(ownerKey+":"+mes+":"+ano).once('value')
+    db.ref('walk_history').orderByChild("owner:month:year").equalTo(owner_id + ":" + month + ":" + year).once('value')
     .then(snapshot => {
         let pagamentosAvulsos = 0;
         let pagamentosPlano = 0;

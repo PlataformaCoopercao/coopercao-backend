@@ -9,7 +9,7 @@ export const getAreas = functions.https.onRequest((request,response) =>{
 
     cors(request, response, () => {
         db.ref('areas').once('value', snapshot =>{
-            let areas = []
+            const areas = []
             snapshot.forEach((childSnapshot) =>{
                 areas.push(childSnapshot.key);
             })

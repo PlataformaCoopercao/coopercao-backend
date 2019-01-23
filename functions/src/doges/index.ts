@@ -1,30 +1,6 @@
 import * as functions from 'firebase-functions';
 import { db } from '../db/index';
 
-export const addTestDog = functions.https.onRequest((request, response) => {
-    db.ref('dog/3').set({ nome: 'jake', idade: 10 })
-        .then(() => {
-            response.status(200).send("Dog adicionado com sucesso");
-        })
-        .catch(error => {
-            response.status(500).send('Deu o erro ${error}');
-        })
-});
-
-export const getTestDog = functions.https.onRequest((request, response) => {
-    db.ref('dog').once('value')
-        .then(snapshot => {
-            const dog = snapshot.val();
-            return dog;
-        })
-        .then(dog => {
-            response.status(200).send(dog);
-        })
-        .catch(error => {
-            response.status(500).send("Deu o erro ${error}")
-        })
-});
-
 export const addDog = functions.https.onRequest((request, response) => {
     if (request.method !== "POST") {
         response.status(400).send("Error");
@@ -38,7 +14,7 @@ export const addDog = functions.https.onRequest((request, response) => {
     const interaction_people = request.body.interaction_people;
     const name = request.body.name;
     const obs = request.body.obs;
-    const owner = request.body.owner;
+    const owner_id = request.body.owner_id;
     const owner_data = request.body.owner_data;
     const photoUrl = request.body.photoUrl;
     const port = request.body.port;
@@ -46,7 +22,7 @@ export const addDog = functions.https.onRequest((request, response) => {
     const vet_name = request.body.vet_name;
     const vet_phone = request.body.vet_phone;
 
-    let myRef = db.ref('dogs').push();
+    const myRef = db.ref('dogs').push();
     myRef.set({
         id: myRef.key,
         age: age,
@@ -57,7 +33,7 @@ export const addDog = functions.https.onRequest((request, response) => {
         interaction_people: interaction_people,
         name: name,
         obs: obs,
-        owner: owner,
+        owner_id: owner_id,
         owner_data: owner_data,
         photoUrl: photoUrl,
         port: port,
@@ -74,19 +50,18 @@ export const addDog = functions.https.onRequest((request, response) => {
         });
 });
 
-export const getListDog = functions.https.onRequest((request, response) => {
+export const clientDogs = functions.https.onRequest((request, response) => {
     if (request.method !== "POST") {
         response.status(400).send("Error");
         // return 0
     }
-    const owner = request.body.owner;
+    const owner_id = request.body.owner_id;
 
-    db.ref('dogs').orderByChild('owner').equalTo(owner).once('value')
+    db.ref('dogs').orderByChild('owner_id').equalTo(owner_id).once('value')
         .then(snapshot => {
-            let dogs = [];
+            const dogs = [];
             snapshot.forEach((childSnapshot => {
-                let key = childSnapshot.key;
-                let childData = childSnapshot.val();
+                const childData = childSnapshot.val();
                 dogs.push(childData);
             }))
 
@@ -112,9 +87,9 @@ export const deleteDog = functions.https.onRequest((request, response) => {
         response.status(400).send("Error");
         // return 0
     }
-    const dog_id = request.body.dog_id;
+    const id = request.body.id;
 
-    db.ref('dogs/' + dog_id).remove()
+    db.ref('dogs/' + id).remove()
         .then(() => {
             response.status(200).send("Cão removido com sucesso");
         })

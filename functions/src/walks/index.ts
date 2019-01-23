@@ -73,7 +73,7 @@ export const assignWalk = functions.https.onRequest((request, response) => {
 })
 
 export const endWalk = functions.https.onRequest((request, response) => {
-    if (request.method != 'POST') {
+    if (request.method !== 'POST') {
         response.status(400).send('Error, request must be POST');
     }
 
@@ -111,7 +111,7 @@ export const endWalk = functions.https.onRequest((request, response) => {
 })
 
 export const walkFeedback = functions.https.onRequest((request, response) => {
-    if (request.method != 'POST') {
+    if (request.method !== 'POST') {
         response.status(400).send('Error, request must be POST');
     }
 
@@ -121,7 +121,7 @@ export const walkFeedback = functions.https.onRequest((request, response) => {
     const feedback = request.body.feedback;
     const activities = request.body.activities;
 
-    let updates ={}
+    const updates ={}
     updates['/walk_history/' + walk_id + '/photoUrls'] = photoUrls;
     updates['/walk_history/' + walk_id + '/obs'] = obs;
     updates['/walk_history/' + walk_id + '/feedback'] = feedback;
