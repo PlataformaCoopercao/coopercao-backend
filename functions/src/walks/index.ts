@@ -40,9 +40,9 @@ export const assignWalk = functions.https.onRequest((request, response) => {
     }
 
     const walk = request.body.walk;
-    const walker = request.body.walker;
+    const walker_id = request.body.walker_id;
 
-    db.ref('walkers/' + walker).once('value')
+    db.ref('walkers/' + walker_id).once('value')
         .then((snapshot) => {
             return snapshot.val();
         })

@@ -13,6 +13,9 @@ export const registerClient = functions.https.onRequest((request, response) => {
         // return 0
     }
 
+    const today = new Date();
+
+    const regist_date = today.getDate()+"."+(today.getMonth()+1)+"."+today.getFullYear();
     const email = request.body.email;
     const pass = request.body.pass;
     const phoneNumber = request.body.phoneNumber;
@@ -47,7 +50,8 @@ export const registerClient = functions.https.onRequest((request, response) => {
                     num: address.num,
                     compl: address.compl,
                     district : address.district
-                }
+                },
+                regist_date:regist_date
             })
         })
         .then(() => {

@@ -176,7 +176,7 @@ export const getAssignedWalks = functions.https.onRequest((request, response) =>
     }
     const walker_id = request.body.walker_id;
 
-    db.ref('walk_assigned').orderByChild('walker').equalTo(walker_id).once('value')
+    db.ref('walk_assigned').orderByChild('walker/id').equalTo(walker_id).once('value')
         .then(snapshot => {
             const assigned_walks = [];
             snapshot.forEach((childSnapshot => {
