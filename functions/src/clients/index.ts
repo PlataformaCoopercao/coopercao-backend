@@ -174,7 +174,7 @@ export const clientWalkHistory = functions.https.onRequest((request, response) =
     }
     const owner_id = request.body.owner_id;
 
-    db.ref('walk_history').orderByChild('dog/owner').equalTo(owner_id).once('value')
+    db.ref('walk_history').orderByChild('dog/owner_id').equalTo(owner_id).once('value')
         .then(snapshot => {
             const walks = [];
             snapshot.forEach((childSnapshot => {
