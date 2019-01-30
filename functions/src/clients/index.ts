@@ -197,13 +197,14 @@ export const clientBill = functions.https.onRequest((request, response) => {
     const year = request.body.year;
 
 
-    db.ref('walk_history').orderByChild("owner:month:year").equalTo(owner_id + ":" + month + ":" + year).once('value')
+    db.ref('walk_history').orderByChild("owner_month_year").equalTo(owner_id + "_" + month + "_" + year).once('value')
         .then(snapshot => {
             let pagamentosAvulsos = 0;
             let pagamentosPlano = 0;
             snapshot.forEach((childSnapshot => {
                 const childData = childSnapshot.val();
-                if (childData.walk_type === 'separate') {
+                if (childData.walk_type === 'separate' || childData.walk_type === 'Separate' ||
+                 childData.walk_type === 'Avulso' || childData.walk_type === 'avulso') {
                     pagamentosAvulsos += childData.value;
                 } else {
                     pagamentosPlano += childData.value;
