@@ -205,9 +205,9 @@ export const clientBill = functions.https.onRequest((request, response) => {
                 const childData = childSnapshot.val();
                 if (childData.walk_type === 'separate' || childData.walk_type === 'Separate' ||
                  childData.walk_type === 'Avulso' || childData.walk_type === 'avulso') {
-                    pagamentosAvulsos += childData.value;
+                    pagamentosAvulsos += parseInt(childData.value);
                 } else {
-                    pagamentosPlano += childData.value;
+                    pagamentosPlano += parseInt(childData.value);
                 }
             }))
             response.status(200).send({
