@@ -136,3 +136,28 @@ export const walkFeedback = functions.https.onRequest((request, response) => {
     })
 
 })
+
+export const cancelAssignedWalk = functions.https.onRequest((request, response) =>{
+
+    if(request.method !== 'POST'){
+        response.status(400).send('Error, request must be POST');
+    }
+
+    const walk = request.body.walk;
+    const cancelled_by = request.body.cancelled_by;
+
+    db.ref('walk_cancelled/'+ walk.id)
+    .set({
+        walk:walk,
+        cancelled_by:cancelled_by
+    })
+    .then(() => {
+        return db.ref('walk_assigned/'+walk.id).remove();
+    })
+    .then(() => {
+        response.status(200).send('The walk was cancelled successfully');
+    })
+    .catch(error =>{
+        response.status(400).send(error);
+    })
+})
